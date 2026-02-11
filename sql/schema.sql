@@ -1,0 +1,53 @@
+-- WEEZ.GG Secure Schema (MySQL)
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  role ENUM('admin','customer') NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(40) NOT NULL UNIQUE,
+  name VARCHAR(120) NOT NULL,
+  cost DECIMAL(12,2) NOT NULL DEFAULT 0,
+  price DECIMAL(12,2) NOT NULL DEFAULT 0,
+  quantity INT NOT NULL DEFAULT 0,
+  details TEXT,
+  emoji VARCHAR(10),
+  category VARCHAR(60),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS offers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(40) NOT NULL UNIQUE,
+  percent_off DECIMAL(5,2) NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_user_id INT NOT NULL,
+  item_id INT NOT NULL,
+  item_code VARCHAR(40) NOT NULL,
+  item_name VARCHAR(120) NOT NULL,
+  item_emoji VARCHAR(10),
+  quantity INT NOT NULL,
+  unit_price DECIMAL(12,2) NOT NULL,
+  unit_cost DECIMAL(12,2) NOT NULL,
+  subtotal DECIMAL(12,2) NOT NULL,
+  discount_pct DECIMAL(5,2) NOT NULL DEFAULT 0,
+  discount_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  total_price DECIMAL(12,2) NOT NULL,
+  total_cost DECIMAL(12,2) NOT NULL,
+  profit DECIMAL(12,2) NOT NULL,
+  payment_method VARCHAR(30) NOT NULL,
+  offer_code VARCHAR(40) NULL,
+  status ENUM('Pending','Accepted','Delivered','Cancelled') NOT NULL DEFAULT 'Pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (customer_user_id) REFERENCES users(id) ON DELETE RESTRICT,
+  FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE RESTRICT
+);
